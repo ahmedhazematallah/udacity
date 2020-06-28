@@ -168,6 +168,11 @@ int doMain(
             vector<cv::DMatch> matches;
             //string matcherType = "MAT_FLANN"/*"MAT_BF"*/;        // MAT_BF, MAT_FLANN
             string desType = "DES_BINARY"; // DES_BINARY, DES_HOG
+		if ((descriptorType == "AKAZE") || (descriptorType == "SIFT"))
+		{
+			desType = "DES_HOG";
+		}
+
             //string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
             //// STUDENT ASSIGNMENT
