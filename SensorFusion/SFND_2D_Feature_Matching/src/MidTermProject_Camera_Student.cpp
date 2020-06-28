@@ -47,9 +47,6 @@ int doMain(
 
     /* MAIN LOOP OVER ALL IMAGES */
 
-    // MP.7, MP.8, MP.9
-    cerr << "Img Id, Detector, Descriptor, Matcher, Selector, Num of Keypoints, Num of Matches, Time Detection, Time Descriptor" endl;
-
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
     {
         /* LOAD IMAGE INTO BUFFER */
@@ -128,11 +125,6 @@ int doMain(
         }
 
         //// EOF STUDENT ASSIGNMENT
-
-        // TASK.MP7
-        cerr << "Img " << imgIndex << ","
-        	 << detectorType << ","
-			 << keypoints.size() << endl;
 
         // optional : limit number of keypoints (helpful for debugging and learning)
         bool bLimitKpts = false;
@@ -251,6 +243,9 @@ int main(int argc, const char *argv[])
 	vector<string> selectorTypes
         = {"SEL_NN", "SEL_KNN"};
     
+	// MP.7, MP.8, MP.9
+	cerr << "Img Id, Detector, Descriptor, Matcher, Selector, Num of Keypoints, Num of Matches, Time Detection, Time Descriptor" << endl;
+
     for (string detectorType : detectorTypes)
     {
         for (string descriptorType : descriptorTypes)

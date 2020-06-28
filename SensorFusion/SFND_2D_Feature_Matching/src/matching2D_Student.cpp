@@ -344,7 +344,7 @@ int detKeypointsModern(
     else
     {
        cout << "Unknown Detector Type: " << detectorType << endl;
-       return;
+       return 0;
     }
 
     // Calculate the time spent in the detection
