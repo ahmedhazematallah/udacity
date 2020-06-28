@@ -14,10 +14,10 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
     if (matcherType.compare("MAT_BF") == 0)
     {
         int normType = cv::NORM_HAMMING;
-	if (descriptorType == "DES_HOG")
-	{
-		normType = cv::NORM_L2;
-	}
+        if (descriptorType == "DES_HOG")
+        {
+        	normType = cv::NORM_L2;
+        }
         matcher = cv::BFMatcher::create(normType, crossCheck);
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
@@ -113,7 +113,7 @@ int descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descri
     }
     else if ( descriptorType == "SIFT")
     {
-        extractor = cv::xfeatures2d::SIFT::create();
+        extractor = cv::SIFT::create();
     }
     else
     {
@@ -301,8 +301,9 @@ void detKeypointsSIFT(
     std::vector<cv::KeyPoint> &keypoints, 
     cv::Mat &img)
 {
-    cv::Ptr<cv::xfeatures2d::SIFT> detector = cv::xfeatures2d::SIFT::create();
-     
+    //cv::Ptr<cv::xfeatures2d::SIFT> detector = cv::xfeatures2d::SIFT::create();
+	cv::Ptr<cv::SIFT> detector = cv::SIFT::create();
+
     // do the detection
     detector->detect(img, keypoints);
 }
