@@ -250,6 +250,14 @@ int main(int argc, const char *argv[])
     {
         for (string descriptorType : descriptorTypes)
         {
+        	// Skip the loop if the descriptor is AKAZE while the detector is not
+        	// reference:https://docs.opencv.org/3.4/d8/d30/classcv_1_1AKAZE.html
+        	//	"AKAZE descriptors can only be used with KAZE or AKAZE keypoints."
+        	if ((descriptorType == "AKAZE") && (detectorType != "AKAZE"))
+        	{
+        		continue;
+        	}
+
             for (string matcherType : matcherTypes)
             {
                 for (string selectorType : selectorTypes)
