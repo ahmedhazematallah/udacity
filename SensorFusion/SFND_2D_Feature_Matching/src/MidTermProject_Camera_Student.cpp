@@ -18,7 +18,8 @@
 
 using namespace std;
 
-
+// A helper function for main so that I can print all results for
+// parts 7, 8, 9
 int doMain(
     string detectorType, 
     string descriptorType,
@@ -46,7 +47,8 @@ int doMain(
 
     /* MAIN LOOP OVER ALL IMAGES */
 
-    cerr << "Img, Detector Type, Num of Keypoints " endl;
+    // MP.7, MP.8, MP.9
+    cerr << "Img Id, Detector, Descriptor, Matcher, Selector, Num of Keypoints, Num of Matches, Time Detection, Time Descriptor" endl;
 
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
     {
@@ -96,7 +98,7 @@ int doMain(
         //// -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
 
         // Call detKeypointsModern with the detector type
-        detKeypointsModern(keypoints, imgGray, detectorType, bVis);
+        int tDetect = detKeypointsModern(keypoints, imgGray, detectorType, bVis);
 
         //// EOF STUDENT ASSIGNMENT
 
@@ -127,6 +129,7 @@ int doMain(
 
         //// EOF STUDENT ASSIGNMENT
 
+        // TASK.MP7
         cerr << "Img " << imgIndex << ","
         	 << detectorType << ","
 			 << keypoints.size() << endl;
@@ -157,7 +160,7 @@ int doMain(
 
         cv::Mat descriptors;
         //string descriptorType = "SIFT"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
-        descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
+        int tDesc = descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
@@ -172,7 +175,7 @@ int doMain(
 
             vector<cv::DMatch> matches;
             //string matcherType = "MAT_FLANN"/*"MAT_BF"*/;        // MAT_BF, MAT_FLANN
-            string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
+            string desType = "DES_BINARY"; // DES_BINARY, DES_HOG
             //string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
             //// STUDENT ASSIGNMENT
@@ -181,7 +184,7 @@ int doMain(
 
             matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                              (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
-                             matches, descriptorType, matcherType, selectorType);
+                             matches, desType, matcherType, selectorType);
 
             //// EOF STUDENT ASSIGNMENT
 
@@ -189,6 +192,18 @@ int doMain(
             (dataBuffer.end() - 1)->kptMatches = matches;
 
             cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
+
+            // TASK.MP8
+            cerr << "Img " << imgIndex 	<< ","
+            	 << detectorType 		<< ","
+				 << descriptorType 		<< ","
+				 << matcherType 		<< ","
+				 << selectorType 		<< ","
+				 << keypoints.size() 	<< ","
+    			 << matches.size() 		<< ","
+				 << tDetect 			<< ","
+				 << tDesc
+				 << endl;
 
             // visualize matches between current and previous image
             bVis = true;
@@ -219,13 +234,21 @@ int doMain(
 /* MAIN PROGRAM */
 int main(int argc, const char *argv[])
 {
-    vector<string> detectorTypes 
+    // All combinations
+	vector<string> detectorTypes
         = {"SHITOMASI", "HARRIS", "FAST", "BRISK", "ORB", "AKAZE", "SIFT"};
-    vector<string> descriptorTypes 
+
+	vector<string> descriptorTypes
         = {"BRISK", "BRIEF", "ORB", "FREAK", "AKAZE", "SIFT"};
-    vector<string> matcherTypes 
+
+	vector<string> matcherTypes
         = {"MAT_BF", "MAT_FLANN"};
-    vector<string> selectorTypes
+
+	// MP8 use BF only
+	//vector<string> matcherTypes
+	//        = {"MAT_BF"};
+
+	vector<string> selectorTypes
         = {"SEL_NN", "SEL_KNN"};
     
     for (string detectorType : detectorTypes)

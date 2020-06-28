@@ -76,7 +76,8 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
 // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
-void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
+// Add return type for the time spent in extraction (in ms)
+int descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
 {
     // select appropriate descriptor
     cv::Ptr<cv::DescriptorExtractor> extractor;
@@ -121,6 +122,8 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     extractor->compute(img, keypoints, descriptors);
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
     cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms" << endl;
+
+    return t * 1000;
 }
 
 // Detect keypoints in image using the traditional Shi-Thomasi detector
@@ -301,7 +304,7 @@ void detKeypointsSIFT(
 }
 
 //   //// -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
-void detKeypointsModern(
+int detKeypointsModern(
     std::vector<cv::KeyPoint> &keypoints, 
     cv::Mat &img, 
     std::string detectorType, 
@@ -358,4 +361,6 @@ void detKeypointsModern(
         imshow(windowName, visImage);
         cv::waitKey(0);
     }
+
+    return t *1000;
 }
