@@ -18,6 +18,9 @@
 
 using namespace std;
 
+#define MP7	0
+#define MP8_9 1
+
 // A helper function for main so that I can print all results for
 // parts 7, 8, 9
 int doMain(
@@ -95,6 +98,7 @@ int doMain(
         //// -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
 
         // Call detKeypointsModern with the detector type
+        bVis = false;
         int tDetect = detKeypointsModern(keypoints, imgGray, detectorType, bVis);
 
         //// EOF STUDENT ASSIGNMENT
@@ -152,14 +156,16 @@ int doMain(
 
         cv::Mat descriptors;
         //string descriptorType = "SIFT"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+#if MP8_9
         int tDesc = descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
+
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
         (dataBuffer.end() - 1)->descriptors = descriptors;
 
         cout << "#3 : EXTRACT DESCRIPTORS done" << endl;
-
+#endif
         if (dataBuffer.size() > 1) // wait until at least two images have been processed
         {
 
@@ -168,10 +174,11 @@ int doMain(
             vector<cv::DMatch> matches;
             //string matcherType = "MAT_FLANN"/*"MAT_BF"*/;        // MAT_BF, MAT_FLANN
             string desType = "DES_BINARY"; // DES_BINARY, DES_HOG
-		if ((descriptorType == "AKAZE") || (descriptorType == "SIFT"))
-		{
-			desType = "DES_HOG";
-		}
+            if (descriptorType == "SIFT")
+            {
+            	// Update the descriptor type so that the macthing function is adapted
+            	desType = "DES_HOG";
+            }
 
             //string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
@@ -179,6 +186,7 @@ int doMain(
             //// TASK MP.5 -> add FLANN matching in file matching2D.cpp
             //// TASK MP.6 -> add KNN match selection and perform descriptor distance ratio filtering with t=0.8 in file matching2D.cpp
 
+#if MP8_9
             matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                              (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
                              matches, desType, matcherType, selectorType);
@@ -189,35 +197,43 @@ int doMain(
             (dataBuffer.end() - 1)->kptMatches = matches;
 
             cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
+#endif
 
-            // TASK.MP8
+            // TASK.MP8 MP9
             cerr << "Img " << imgIndex 	<< ","
             	 << detectorType 		<< ","
+#if MP8_9
 				 << descriptorType 		<< ","
 				 << matcherType 		<< ","
 				 << selectorType 		<< ","
+#endif
 				 << keypoints.size() 	<< ","
-    			 << matches.size() 		<< ","
+#if MP8_9
+				 << matches.size() 		<< ","
 				 << tDetect 			<< ","
 				 << tDesc
+#endif
 				 << endl;
 
             // visualize matches between current and previous image
-            bVis = true;
+            bVis = false;
             if (bVis)
             {
-                cv::Mat matchImg = ((dataBuffer.end() - 1)->cameraImg).clone();
+#if MP7
+            	cv::Mat matchImg = ((dataBuffer.end() - 1)->cameraImg).clone();
                 cv::drawMatches((dataBuffer.end() - 2)->cameraImg, (dataBuffer.end() - 2)->keypoints,
                                 (dataBuffer.end() - 1)->cameraImg, (dataBuffer.end() - 1)->keypoints,
                                 matches, matchImg,
                                 cv::Scalar::all(-1), cv::Scalar::all(-1),
                                 vector<char>(), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-                string windowName = "Matching keypoints between two camera images";
+                string windowName = "Matching keypoints between two camera images: " + detectorType;
                 cv::namedWindow(windowName, 7);
+
                 cv::imshow(windowName, matchImg);
                 cout << "Press key to continue to next image" << endl;
-                //cv::waitKey(0); // wait for key to be pressed
+                cv::waitKey(0); // wait for key to be pressed
+#endif
             }
             bVis = false;
         }
@@ -238,27 +254,49 @@ int main(int argc, const char *argv[])
 	vector<string> descriptorTypes
         = {"BRISK", "BRIEF", "ORB", "FREAK", "AKAZE", "SIFT"};
 
-	vector<string> matcherTypes
-        = {"MAT_BF", "MAT_FLANN"};
-
-	// MP8 use BF only
 	//vector<string> matcherTypes
-	//        = {"MAT_BF"};
+    //    = {"MAT_BF", "MAT_FLANN"};
 
-	vector<string> selectorTypes
-        = {"SEL_NN", "SEL_KNN"};
-    
-	// MP.7, MP.8, MP.9
+	// MP8 use BF only with KNN and threshold 0.8
+	vector<string> matcherTypes = {"MAT_BF"};
+	vector<string> selectorTypes = {/*"SEL_NN",*/ "SEL_KNN"};
+
+#if MP7
+	// MP.7
+	cerr << "Img Id, Detector, Num of Keypoints" << endl;
+#endif
+
+#if MP8_9
+	// MP.8, MP.9
 	cerr << "Img Id, Detector, Descriptor, Matcher, Selector, Num of Keypoints, Num of Matches, Time Detection, Time Descriptor" << endl;
+#endif
 
     for (string detectorType : detectorTypes)
     {
-        for (string descriptorType : descriptorTypes)
+#if MP7
+    	// MP.7
+    	cout << endl
+    	     << "<<<<<<<<<<<<<<< "
+    	     << detectorType << ", "
+    	     << " >>>>>>>>>>>>>>>" << endl;
+
+    	// Call the function only with a valid detector
+    	doMain(detectorType, "", "", "");
+#endif
+
+#if MP8_9
+    	for (string descriptorType : descriptorTypes)
         {
         	// Skip the loop if the descriptor is AKAZE while the detector is not
         	// reference:https://docs.opencv.org/3.4/d8/d30/classcv_1_1AKAZE.html
         	//	"AKAZE descriptors can only be used with KAZE or AKAZE keypoints."
         	if ((descriptorType == "AKAZE") && (detectorType != "AKAZE"))
+        	{
+        		continue;
+        	}
+
+        	// Skip the loop if the descriptor is ORB while the detector is SIFT
+        	if ( (detectorType == "SIFT") && (descriptorType == "ORB"))
         	{
         		continue;
         	}
@@ -279,6 +317,7 @@ int main(int argc, const char *argv[])
                 }
             }
         }
+#endif
     }
     
 

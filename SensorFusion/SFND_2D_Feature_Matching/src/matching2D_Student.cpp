@@ -75,13 +75,12 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
     }
 
     cout << "   Number of matched points: " << matches.size() << endl;
-    
-}
+    }
 
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
 // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
 // Add return type for the time spent in extraction (in ms)
-int descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
+float descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
 {
     // select appropriate descriptor
     cv::Ptr<cv::DescriptorExtractor> extractor;
@@ -309,7 +308,7 @@ void detKeypointsSIFT(
 }
 
 //   //// -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
-int detKeypointsModern(
+float detKeypointsModern(
     std::vector<cv::KeyPoint> &keypoints, 
     cv::Mat &img, 
     std::string detectorType, 
