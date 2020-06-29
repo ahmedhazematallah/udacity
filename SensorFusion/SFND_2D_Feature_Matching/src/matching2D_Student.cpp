@@ -114,7 +114,13 @@ float descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &desc
     }
     else if ( descriptorType == "SIFT")
     {
-        extractor = cv::SIFT::create();
+        // Use cv::SIFT directly on my laptop
+#if mylaptop
+    	extractor = cv::SIFT::create();
+#else
+    	extractor = cv::xfeatures2d::SIFT::create();
+#endif
+
     }
     else
     {
