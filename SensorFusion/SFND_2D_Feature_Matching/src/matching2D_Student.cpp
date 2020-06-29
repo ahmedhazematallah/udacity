@@ -302,8 +302,12 @@ void detKeypointsSIFT(
     std::vector<cv::KeyPoint> &keypoints, 
     cv::Mat &img)
 {
-    //cv::Ptr<cv::xfeatures2d::SIFT> detector = cv::xfeatures2d::SIFT::create();
+    // Use cv::SIFT directly on my laptop
+#if mylaptop
 	cv::Ptr<cv::SIFT> detector = cv::SIFT::create();
+#else
+	cv::Ptr<cv::xfeatures2d::SIFT> detector = cv::xfeatures2d::SIFT::create();
+#endif
 
     // do the detection
     detector->detect(img, keypoints);
