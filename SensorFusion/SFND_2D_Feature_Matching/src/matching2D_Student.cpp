@@ -13,7 +13,9 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 
     if (matcherType.compare("MAT_BF") == 0)
     {
+    	// Use hamming distance for binary descriptors
         int normType = cv::NORM_HAMMING;
+
         if (descriptorType == "DES_HOG")
         {
         	normType = cv::NORM_L2;
