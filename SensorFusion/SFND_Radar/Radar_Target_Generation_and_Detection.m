@@ -10,11 +10,15 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %speed of light = 3e8
+c = 3e8;
+
 %% User Defined Range and Velocity of target
 % *%TODO* :
 % define the target's initial position and velocity. Note : Velocity
 % remains contant
  
+R = 100;    % Initial distance to the target (Max 200)
+v = 30;    % Initial speed of the target (from -70 to +70)
 
 
 %% FMCW Waveform Generation
@@ -28,7 +32,24 @@ clc;
 %Operating carrier frequency of Radar 
 fc= 77e9;             %carrier freq
 
-                                                          
+% Range Resolution = 1m 
+% d_Res = c / (2B)
+d_res = 1;
+
+% Maximum Range
+R_max = 200;
+
+% bandwidth B
+% Result = 150 MHz
+B = c / (2 * d_res);
+
+% Calculate the time of the chirp
+Tchirp = 5.5 * 2 * R_max / c;
+
+% Calculate the slope
+slope = B / Tchirp;
+
+
 %The number of chirps in one sequence. Its ideal to have 2^ value for the ease of running the FFT
 %for Doppler Estimation. 
 Nd=128;                   % #of doppler cells OR #of sent periods % number of chirps
@@ -59,51 +80,72 @@ for i=1:length(t)
     
     % *%TODO* :
     %For each time stamp update the Range of the Target for constant velocity. 
+    r_t(i) = R + v * t(i);
+    
+    td(i) = r_t(i) / c * 2;
     
     % *%TODO* :
     %For each time sample we need update the transmitted and
     %received signal. 
-    Tx(i) = 
-    Rx (i)  =
+    % Tx=cos(2π(f * t + slope t^2 / 2))
+
+    Tx(i) = cos(2 * pi * (fc * t(i) + slope * (t(i) ^2) / 2));
+    
+    Rx(i) = cos(2 * pi * (fc * (t(i)-td(i)) + slope * ((t(i) - td(i))^2) / 2));
     
     % *%TODO* :
     %Now by mixing the Transmit and Receive generate the beat signal
     %This is done by element wise matrix multiplication of Transmit and
     %Receiver Signal
-    Mix(i) = 
+    Mix(i) = Tx(i) * Rx(i);
     
 end
 
 %% RANGE MEASUREMENT
 
+%figure ('Name','Tx Signal')
+%hold on
+%plot(t, Tx, 'r');
+%plot(t, Rx, 'g');
+%plot(t, Mix, 'b');
+%legend('Tx', 'Rx', 'Mix');
+%hold off
 
  % *%TODO* :
 %reshape the vector into Nr*Nd array. Nr and Nd here would also define the size of
 %Range and Doppler FFT respectively.
+Mix_reshaped = reshape(Mix, [Nr, Nd]);
 
  % *%TODO* :
 %run the FFT on the beat signal along the range bins dimension (Nr) and
 %normalize.
+Mix_reshaped_fft = fft(Mix_reshaped, [], 1);
 
  % *%TODO* :
 % Take the absolute value of FFT output
+Mix_reshaped_fft_abs = abs(Mix_reshaped_fft / Nr);
 
  % *%TODO* :
 % Output of FFT is double sided signal, but we are interested in only one side of the spectrum.
 % Hence we throw out half of the samples.
-
+Mix_reshaped_fft_abs_single = 2* Mix_reshaped_fft_abs(1:Nr/2,1);
 
 %plotting the range
 figure ('Name','Range from First FFT')
 subplot(2,1,1)
 
- % *%TODO* :
- % plot FFT output 
-
+% *%TODO* :
+% plot FFT output 
+% f = Fs*(0:(L/2))/L;
+% Sample Time = Tchirp / Nr ,
+Fs = Nr / Tchirp;
+L = Nr * Nd;
+f_fft = Fs/B*(0:(Nr/2)-1);
+plot(f_fft, Mix_reshaped_fft_abs_single);
  
 axis ([0 200 0 1]);
 
-
+%return
 
 %% RANGE DOPPLER RESPONSE
 % The 2D FFT implementation is already provided here. This will run a 2DFFT
@@ -117,10 +159,10 @@ axis ([0 200 0 1]);
 % doppler FFT bins. So, it is important to convert the axis from bin sizes
 % to range and doppler based on their Max values.
 
-Mix=reshape(Mix,[Nr,Nd]);
+sig_resh=reshape(Mix,[Nr,Nd]);
 
 % 2D FFT using the FFT size for both dimensions.
-sig_fft2 = fft2(Mix,Nr,Nd);
+sig_fft2 = fft2(sig_resh,Nr,Nd);
 
 % Taking just one side of signal from Range dimension.
 sig_fft2 = sig_fft2(1:Nr/2,1:Nd);
@@ -130,10 +172,11 @@ RDM = 10*log10(RDM) ;
 
 %use the surf function to plot the output of 2DFFT and to show axis in both
 %dimensions
-doppler_axis = linspace(-100,100,Nd);
-range_axis = linspace(-200,200,Nr/2)*((Nr/2)/400);
+doppler_axis = linspace(-100,100,Nd); % velocity -70 to +70
+range_axis = linspace(-200,200,Nr/2)*((Nr/2)/400); % Range 0-200
 figure,surf(doppler_axis,range_axis,RDM);
 
+return
 %% CFAR implementation
 
 %Slide Window through the complete Range Doppler Map
