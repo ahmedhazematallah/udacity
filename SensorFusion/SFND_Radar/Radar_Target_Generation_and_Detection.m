@@ -17,13 +17,13 @@ c = 3e8;
 % define the target's initial position and velocity. Note : Velocity
 % remains contant
  
-R = 100;    % Initial distance to the target (Max 200)
+R = 120;    % Initial distance to the target (Max 200)
 v = 30;    % Initial speed of the target (from -70 to +70)
 
 
 %% FMCW Waveform Generation
 
-% *%TODO* :
+
 %Design the FMCW waveform by giving the specs of each of its parameters.
 % Calculate the Bandwidth (B), Chirp Time (Tchirp) and Slope (slope) of the FMCW
 % chirp using the requirements above.
@@ -103,49 +103,36 @@ end
 
 %% RANGE MEASUREMENT
 
-%figure ('Name','Tx Signal')
-%hold on
-%plot(t, Tx, 'r');
-%plot(t, Rx, 'g');
-%plot(t, Mix, 'b');
-%legend('Tx', 'Rx', 'Mix');
-%hold off
-
- % *%TODO* :
 %reshape the vector into Nr*Nd array. Nr and Nd here would also define the size of
 %Range and Doppler FFT respectively.
 Mix_reshaped = reshape(Mix, [Nr, Nd]);
 
- % *%TODO* :
 %run the FFT on the beat signal along the range bins dimension (Nr) and
 %normalize.
 Mix_reshaped_fft = fft(Mix_reshaped, [], 1);
 
- % *%TODO* :
 % Take the absolute value of FFT output
+% Normalize the value too
 Mix_reshaped_fft_abs = abs(Mix_reshaped_fft / Nr);
-
- % *%TODO* :
+ 
 % Output of FFT is double sided signal, but we are interested in only one side of the spectrum.
 % Hence we throw out half of the samples.
-Mix_reshaped_fft_abs_single = 2* Mix_reshaped_fft_abs(1:Nr/2,1);
+Mix_reshaped_fft_abs_single = 2* Mix_reshaped_fft_abs(1:Nr/2,:);
 
 %plotting the range
 figure ('Name','Range from First FFT')
 subplot(2,1,1)
 
-% *%TODO* :
 % plot FFT output 
-% f = Fs*(0:(L/2))/L;
-% Sample Time = Tchirp / Nr ,
-Fs = Nr / Tchirp;
-L = Nr * Nd;
-f_fft = Fs/B*(0:(Nr/2)-1);
-plot(f_fft, Mix_reshaped_fft_abs_single);
+
+% Calculate the range axis
+my_range_axis = d_res * (0:(Nr/2)-1);
+
+% for the y-axis, select any vector of the Nd vectors, i choose the first
+plot(my_range_axis, Mix_reshaped_fft_abs_single(:,1));
  
 axis ([0 200 0 1]);
 
-%return
 
 %% RANGE DOPPLER RESPONSE
 % The 2D FFT implementation is already provided here. This will run a 2DFFT
@@ -176,27 +163,32 @@ doppler_axis = linspace(-100,100,Nd); % velocity -70 to +70
 range_axis = linspace(-200,200,Nr/2)*((Nr/2)/400); % Range 0-200
 figure,surf(doppler_axis,range_axis,RDM);
 
-return
 %% CFAR implementation
 
 %Slide Window through the complete Range Doppler Map
 
-% *%TODO* :
 %Select the number of Training Cells in both the dimensions.
+Tr = 10;
+Td = 12;
 
-% *%TODO* :
 %Select the number of Guard Cells in both dimensions around the Cell under 
 %test (CUT) for accurate estimation
+Gr = 3;
+Gd = 6;
 
-% *%TODO* :
 % offset the threshold by SNR value in dB
+offset = 6;
 
-% *%TODO* :
 %Create a vector to store noise_level for each iteration on training cells
-noise_level = zeros(1,1);
+noise_level = zeros(Nr/2 - (2*Tr + 2*Gr + 1), ...
+                    Nd - (2*Td + 2*Gd + 1));
 
+% Number of training cells
+numOfTrainingCells = (2*Tr+2*Gr+1) * (2*Td+2*Gd+1) - (2*Gr+1)*(2*Gd+1);
 
-% *%TODO* :
+%Create a vector for the filtered signal after checking it vs the threshold
+CFAR_result = zeros(Nr/2, Nd);
+                
 %design a loop such that it slides the CUT across range doppler map by
 %giving margins at the edges for Training and Guard Cells.
 %For every iteration sum the signal level within all the training
@@ -206,35 +198,79 @@ noise_level = zeros(1,1);
 %Further add the offset to it to determine the threshold. Next, compare the
 %signal under CUT with this threshold. If the CUT level > threshold assign
 %it a value of 1, else equate it to 0.
-
+for row = 1:Nr/2 - (2*Tr + 2*Gr)
+    for col = 1:Nd - (2*Td + 2*Gd)
 
    % Use RDM[x,y] as the matrix from the output of 2D FFT for implementing
    % CFAR
-
-
-
-
-
-% *%TODO* :
+   
+   % Loop on the grid and add each element that belongs to the training
+   % cells
+        % Reset the noise value
+        noise = 0;
+        
+        % Calculate the sum of the noise of all the training cells
+        for i = row:row + (2*Tr + 2*Gr)
+            for j = col:col + (2*Td + 2*Gd)
+                   
+                % Skip the guard cells & CUT
+                if ( (i >= (row + Tr)) && (i <= (row + Tr + 2 * Gr)) && ...
+                     (j >= (col + Td)) && (j <= (col + Td + 2 * Gd)) )
+                    continue
+                end
+            
+                % Add the noise of the current training cell
+                noise = noise + db2pow(RDM(i,j));
+            end
+        end
+        
+        % Divide the sum by the number of training cells to obtain the 
+        % average                    
+        noise_level(row,col) = noise / numOfTrainingCells;
+        
+        % Convert the noise back to dB and add the offset
+        noise_level(row,col) = pow2db(noise_level(row,col)) + offset;
+        
+        % Obtain the value of the CUT
+        cut_x = row + Tr + Gr;
+        cut_y = col + Td + Gd;
+        cut = RDM(cut_x, cut_y);
+        
+        % Compare it to the noise level
+        if (cut < noise_level(row,col))
+            CFAR_result(cut_x, cut_y) = 0;
+        else
+            CFAR_result(cut_x, cut_y) = 1;
+        end
+    end
+end
+            
 % The process above will generate a thresholded block, which is smaller 
 %than the Range Doppler Map as the CUT cannot be located at the edges of
 %matrix. Hence,few cells will not be thresholded. To keep the map size same
 % set those values to 0. 
  
-
-
-
-
-
-
-
-
-% *%TODO* :
 %display the CFAR output using the Surf function like we did for Range
 %Doppler Response output.
-figure,surf(doppler_axis,range_axis,'replace this with output');
+figure,surf(doppler_axis, range_axis, CFAR_result);
 colorbar;
 
 
- 
+% 
+% Measure and average the noise across all the training cells. 
+% This gives the threshold
+% 
+% Add the offset (if in signal strength in dB) to the threshold to keep 
+% the false alarm to the minimum.
+% 
+% Determine the signal level at the Cell Under Test.
+% 
+% If the CUT signal level is greater than the Threshold, assign a value 
+% of 1, else equate it to zero.
+% 
+% Since the cell under test are not located at the edges, due to the 
+% training cells occupying the edges, we suppress the edges to zero. 
+% Any cell value that is neither 1 nor a 0, assign it a zero.
+
+
  
