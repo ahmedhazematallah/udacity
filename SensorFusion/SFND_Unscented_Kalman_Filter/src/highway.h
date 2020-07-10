@@ -150,17 +150,23 @@ public:
 		viewer->addText("Vx: "	+std::to_string(rmse[2]), 30, 225, 20, 1, 1, 1, "rmse_vx");
 		viewer->addText("Vy: "	+std::to_string(rmse[3]), 30, 200, 20, 1, 1, 1, "rmse_vy");
 
+		//std::cout <<"\nTime = " << timestamp << ", Size = " << tools.estimations.size() << std::endl;
+		//std::cout << "<<<<<< RMSE X: " << rmse[0] << std::endl;
+		//std::cout << "<<<<<< RMSE Y: " << rmse[1] << std::endl << std::endl;
+
 		if(timestamp > 1.0e6)
 		{
 
 			if(rmse[0] > rmseThreshold[0])
 			{
 				rmseFailLog[0] = rmse[0];
+				//std::cout<< "<<<<<< RMSE X Fail >>>>>>" << rmse[0] << " is greater than " << rmseThreshold[0] << std::endl;
 				pass = false;
 			}
 			if(rmse[1] > rmseThreshold[1])
 			{
 				rmseFailLog[1] = rmse[1];
+				//std::cout<< "<<<<<< RMSE Y Fail >>>>>>" << rmse[1] << " is greater than " << rmseThreshold[1] << std::endl;
 				pass = false;
 			}
 			if(rmse[2] > rmseThreshold[2])

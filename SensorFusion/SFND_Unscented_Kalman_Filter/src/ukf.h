@@ -41,7 +41,6 @@ class UKF {
    */
   void UpdateRadar(MeasurementPackage meas_package);
 
-
   // initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
 
@@ -93,8 +92,23 @@ class UKF {
   // Augmented state dimension
   int n_aug_;
 
+  int n_z_radar_;
+  int n_z_laser_;
+
   // Sigma point spreading parameter
   double lambda_;
+
+private:
+  void GenerateAugmentedSigmaPoints(Eigen::MatrixXd &Xsig_aug_out) ;
+  void SigmaPointPrediction(Eigen::MatrixXd& Xsig_aug, double delta_t);
+  void PredictMeanAndCovariance();
+
+  void UpdateRadarMatrices(Eigen::MatrixXd &Zsig, Eigen::VectorXd &z_pred, Eigen::MatrixXd &S);
+  void UpdateRadarState(Eigen::MatrixXd &Zsig, Eigen::VectorXd &z_pred, Eigen::MatrixXd &S, MeasurementPackage& meas_pack);
+
+  void UpdateLaserMatrices(Eigen::MatrixXd &Zsig, Eigen::VectorXd &z_pred, Eigen::MatrixXd &S);
+  void UpdateLaserState(Eigen::MatrixXd &Zsig, Eigen::VectorXd &z_pred, Eigen::MatrixXd &S, MeasurementPackage& meas_pack);
+
 };
 
 #endif  // UKF_H

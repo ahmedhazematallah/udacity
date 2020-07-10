@@ -1,5 +1,6 @@
 #include <iostream>
 #include "tools.h"
+#include <random> // added to recognize mt19937 on my laptop
 
 using namespace std;
 using std::vector;
