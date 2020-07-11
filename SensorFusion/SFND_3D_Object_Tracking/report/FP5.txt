@@ -1,0 +1,111 @@
+Running for MP5
+Threshold for Lidar outliers = 1m.
+ === IMAGE 0 ===
+ === IMAGE 1 ===
+Prev xMin, xMean, diff = 7.974, 8.07513, -0.101135
+Curr xMin, xMean, diff = 7.913, 8.00996, -0.0969555
+If we used mean, TTC Lidar = 12.2891
+=> Result TTC Lidar = 12.9722
+
+ === IMAGE 2 ===
+Prev xMin, xMean, diff = 7.913, 8.00996, -0.0969555
+Curr xMin, xMean, diff = 7.849, 7.95042, -0.101423
+If we used mean, TTC Lidar = 13.3547
+=> Result TTC Lidar = 12.264
+
+ === IMAGE 3 ===
+Prev xMin, xMean, diff = 7.849, 7.95042, -0.101423
+Curr xMin, xMean, diff = 7.793, 7.90219, -0.109193
+If we used mean, TTC Lidar = 16.3845
+=> Result TTC Lidar = 13.9161
+
+ === IMAGE 4 ===
+Prev xMin, xMean, diff = 7.793, 7.90219, -0.109193
+Curr xMin, xMean, diff = 7.685, 7.84645, -0.161451
+If we used mean, TTC Lidar = 14.0764
+=> Result TTC Lidar = 7.11572
+
+ === IMAGE 5 ===
+Prev xMin, xMean, diff = 7.685, 7.84645, -0.161451
+Curr xMin, xMean, diff = 7.638, 7.78529, -0.147294
+If we used mean, TTC Lidar = 12.7299
+=> Result TTC Lidar = 16.2511
+
+ === IMAGE 6 ===
+Prev xMin, xMean, diff = 7.638, 7.78529, -0.147294
+Curr xMin, xMean, diff = 7.577, 7.72909, -0.152087
+If we used mean, TTC Lidar = 13.7511
+=> Result TTC Lidar = 12.4213
+
+ === IMAGE 7 ===
+Prev xMin, xMean, diff = 7.577, 7.72909, -0.152087
+Curr xMin, xMean, diff = 7.555, 7.67321, -0.118207
+If we used mean, TTC Lidar = 13.7314
+=> Result TTC Lidar = 34.3404
+
+ === IMAGE 8 ===
+Prev xMin, xMean, diff = 7.555, 7.67321, -0.118207
+Curr xMin, xMean, diff = 7.475, 7.61796, -0.142964
+If we used mean, TTC Lidar = 13.7901
+=> Result TTC Lidar = 9.34376
+
+ === IMAGE 9 ===
+Prev xMin, xMean, diff = 7.475, 7.61796, -0.142964
+Curr xMin, xMean, diff = 7.434, 7.55531, -0.121311
+If we used mean, TTC Lidar = 12.059
+=> Result TTC Lidar = 18.1318
+
+ === IMAGE 10 ===
+Prev xMin, xMean, diff = 7.434, 7.55531, -0.121311
+Curr xMin, xMean, diff = 7.393, 7.49216, -0.0991617
+If we used mean, TTC Lidar = 11.8642
+=> Result TTC Lidar = 18.0318
+
+ === IMAGE 11 ===
+Prev xMin, xMean, diff = 7.393, 7.49216, -0.0991617
+Curr xMin, xMean, diff = 7.205, 7.43008, -0.22508
+If we used mean, TTC Lidar = 11.9682
+=> Result TTC Lidar = 3.83244
+
+ === IMAGE 12 ===
+Prev xMin, xMean, diff = 7.205, 7.43008, -0.22508
+Curr xMin, xMean, diff = 7.272, 7.35568, -0.0836835
+If we used mean, TTC Lidar = 9.88711
+=> Result TTC Lidar = -10.8537
+
+ === IMAGE 13 ===
+Prev xMin, xMean, diff = 7.272, 7.35568, -0.0836835
+Curr xMin, xMean, diff = 7.194, 7.27846, -0.0844588
+If we used mean, TTC Lidar = 9.42504
+=> Result TTC Lidar = 9.22307
+
+ === IMAGE 14 ===
+Prev xMin, xMean, diff = 7.194, 7.27846, -0.0844588
+Curr xMin, xMean, diff = 7.129, 7.20105, -0.0720457
+If we used mean, TTC Lidar = 9.30215
+=> Result TTC Lidar = 10.9678
+
+ === IMAGE 15 ===
+Prev xMin, xMean, diff = 7.129, 7.20105, -0.0720457
+Curr xMin, xMean, diff = 7.042, 7.11553, -0.0735351
+If we used mean, TTC Lidar = 8.3212
+=> Result TTC Lidar = 8.09422
+
+ === IMAGE 16 ===
+Prev xMin, xMean, diff = 7.042, 7.11553, -0.0735351
+Curr xMin, xMean, diff = 6.827, 7.03646, -0.209462
+If we used mean, TTC Lidar = 8.89867
+=> Result TTC Lidar = 3.17535
+
+ === IMAGE 17 ===
+Prev xMin, xMean, diff = 6.827, 7.03646, -0.209462
+Curr xMin, xMean, diff = 6.896, 6.97324, -0.0772419
+If we used mean, TTC Lidar = 11.0301
+=> Result TTC Lidar = -9.99424
+
+ === IMAGE 18 ===
+Prev xMin, xMean, diff = 6.896, 6.97324, -0.0772419
+Curr xMin, xMean, diff = 6.814, 6.89249, -0.0784914
+If we used mean, TTC Lidar = 8.53557
+=> Result TTC Lidar = 8.30978
+
