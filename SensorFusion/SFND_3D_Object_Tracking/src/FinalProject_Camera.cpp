@@ -382,7 +382,12 @@ int main(int argc, const char *argv[])
 	vector<string> detectorTypes
         = {"FAST"
 #if FP6
-        	,"SHITOMASI", "HARRIS", "BRISK", "ORB", "AKAZE", "SIFT"
+        	,"SHITOMASI",
+			"HARRIS",
+			"BRISK",
+			"ORB",
+			"AKAZE",
+			"SIFT"
 #endif
          };
 
